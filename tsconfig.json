@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outDir": "build",
+    "sourceMap": true,
+    "lib": ["es2016", "esnext.array", "dom"],
+    "strict": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "scripts"]
+}
