@@ -1,8 +1,13 @@
 import { getValidatorsFromString } from ".";
 
 test("generates proper validators for primitive types", () => {
-  const source = `
-    type num = number;
-  `;
-  expect(getValidatorsFromString(source)).toBe("const num = t.number");
+  expect(getValidatorsFromString("type num = number;")).toBe(
+    "const num = t.number"
+  );
+  expect(getValidatorsFromString("type str = string;")).toBe(
+    "const str = t.string"
+  );
+  expect(getValidatorsFromString("type nil = null;")).toBe(
+    "const nil = t.null"
+  );
 });
