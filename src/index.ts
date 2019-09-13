@@ -104,13 +104,6 @@ function handleVariableDeclaration(
     symbol!,
     symbol!.valueDeclaration!
   );
-  if (symbol)
-    console.log({
-      b: checker.typeToString(
-        checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!)
-      )
-    });
-
   result.push(processType(checker)(type));
 }
 
