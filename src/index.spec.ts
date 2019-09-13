@@ -11,3 +11,16 @@ test("generates proper validators for primitive types", () => {
     "const nil = t.null"
   );
 });
+
+test("generates proper validators for basic interfaces and object types", () => {
+  const inputInterface = `
+    interface Test { foo: number, bar: string }
+  `;
+  const inputObjectType = `
+    type Test = { foo: number, bar: string }
+  `;
+  const result = "const Test = t.type({foo: t.number, bar: t.string})";
+
+  expect(getValidatorsFromString(inputInterface)).toBe(result);
+  expect(getValidatorsFromString(inputObjectType)).toBe(result);
+});
