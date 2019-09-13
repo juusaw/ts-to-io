@@ -201,5 +201,5 @@ function isEntryPoint() {
 }
 
 if (isEntryPoint()) {
-  console.log(getValidatorsFromFileNames(["source.ts"]));
+  console.log(getValidatorsFromFileNames([process.argv[2]]));
 }
