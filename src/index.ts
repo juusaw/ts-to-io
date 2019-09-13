@@ -30,6 +30,39 @@ function isArrayType(type: ts.Type, checker: ts.TypeChecker) {
   return ts.isArrayTypeNode(node!);
 }
 
+const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
+  return `${s.name}: ${processType(checker)(
+    checker.getTypeOfSymbolAtLocation(s, s.valueDeclaration)
+  )}`;
+};
+
+const processObjectType = (checker: ts.TypeChecker) => (
+  type: ts.ObjectType
+) => {
+  const properties = checker.getPropertiesOfType(type);
+  const requiredProperties = properties.filter(
+    p => !(p.valueDeclaration as ts.ParameterDeclaration).questionToken
+  );
+  const optionalProperties = properties.filter(
+    p => (p.valueDeclaration as ts.ParameterDeclaration).questionToken
+  );
+  if (requiredProperties.length && optionalProperties.length) {
+    return `t.union([t.type({${requiredProperties.map(
+      processProperty(checker)
+    )}}), t.partial({${optionalProperties
+      .map(processProperty(checker))
+      .join(", ")}})])`;
+  } else if (optionalProperties.length === 0) {
+    return `t.type({${requiredProperties
+      .map(processProperty(checker))
+      .join(", ")}})`;
+  } else {
+    return `t.partial({${optionalProperties
+      .map(processProperty(checker))
+      .join(", ")}})`;
+  }
+};
+
 const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
   if (type.isLiteral()) {
     return "t.literal(" + checker.typeToString(type) + ")";
@@ -53,18 +86,7 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
   } else if (isArrayType(type, checker)) {
     return `t.array(${processType(checker)(type.getNumberIndexType()!)})`;
   } else if (isObjectType(type)) {
-    const properties = checker
-      .getPropertiesOfType(type)
-      .map(
-        s =>
-          [
-            s.name,
-            checker.getTypeOfSymbolAtLocation(s, s.valueDeclaration)
-          ] as const
-      );
-    return `t.type({${properties
-      .map(([n, t]) => n + ":" + processType(checker)(t))
-      .join(", ")}})`;
+    return processObjectType(checker)(type);
   } else if (isAnyOrUnknown(type)) {
     return "t.unknown";
   }
