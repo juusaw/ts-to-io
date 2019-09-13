@@ -129,16 +129,43 @@ const visit = (checker: ts.TypeChecker, result: string[]) => (
 };
 
 export function getValidatorsFromString(source: string) {
-  const sourceFile = ts.createSourceFile(
-    "ts-to-io.ts",
-    source,
-    ts.ScriptTarget.ES2015,
-    true
+  const DEFAULT_FILE_NAME = "io-to-ts.ts";
+  const defaultCompilerHostOptions = ts.createCompilerHost({});
+
+  const compilerHostOptions = {
+    ...defaultCompilerHostOptions,
+    getSourceFile: (
+      filename: string,
+      languageVersion: ts.ScriptTarget,
+      ...restArgs: any[]
+    ) => {
+      if (filename === DEFAULT_FILE_NAME)
+        return ts.createSourceFile(
+          filename,
+          source,
+          ts.ScriptTarget.ES2015,
+          true
+        );
+      else
+        return defaultCompilerHostOptions.getSourceFile(
+          filename,
+          languageVersion,
+          ...restArgs
+        );
+    }
+  };
+
+  const program = ts.createProgram(
+    [DEFAULT_FILE_NAME],
+    {},
+    compilerHostOptions
   );
-  const program = ts.createProgram(["ts-to-io.ts"], {});
   const checker = program.getTypeChecker();
   const result: string[] = [];
-  ts.forEachChild(sourceFile, visit(checker, result));
+  ts.forEachChild(
+    program.getSourceFile(DEFAULT_FILE_NAME)!,
+    visit(checker, result)
+  );
   return result.join("\n\n");
 }
 
