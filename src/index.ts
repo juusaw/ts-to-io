@@ -1,46 +1,14 @@
 import * as ts from "typescript";
-
-function isObjectType(type: ts.Type): type is ts.ObjectType {
-  return type.flags === ts.TypeFlags.Object;
-}
-
-function isPrimitiveType(type: ts.Type) {
-  return [
-    ts.TypeFlags.String,
-    ts.TypeFlags.Number,
-    ts.TypeFlags.Boolean,
-    ts.TypeFlags.Null
-  ].includes(type.flags);
-}
-
-function isAnyOrUnknown(type: ts.Type) {
-  return [ts.TypeFlags.Any, ts.TypeFlags.Unknown].includes(type.flags);
-}
-
-function isTupleType(
-  type: ts.Type,
-  checker: ts.TypeChecker
-): type is ts.TupleType {
-  const node = checker.typeToTypeNode(type);
-  return ts.isTupleTypeNode(node!);
-}
-
-function isRecordType(type: ts.Type) {
-  return type.aliasSymbol && type.aliasSymbol.escapedName === "Record";
-}
-
-function isStringIndexedObjectType(type: ts.Type) {
-  return type.getStringIndexType();
-}
-
-function isNumberIndexedType(type: ts.Type) {
-  return type.getNumberIndexType();
-}
-
-function isArrayType(type: ts.Type, checker: ts.TypeChecker) {
-  const node = checker.typeToTypeNode(type);
-  return ts.isArrayTypeNode(node!);
-}
+import {
+  isPrimitiveType,
+  isStringIndexedObjectType,
+  isRecordType,
+  isNumberIndexedType,
+  isTupleType,
+  isArrayType,
+  isObjectType,
+  isAnyOrUnknown
+} from "./type";
 
 const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
   return `${s.name}: ${processType(checker)(
