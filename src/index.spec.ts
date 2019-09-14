@@ -33,3 +33,22 @@ test("generates proper validators for record types", () => {
     "const rec = t.record(t.string, t.null)"
   );
 });
+
+test("generates proper validators for union types", () => {
+  expect(getValidatorsFromString("type un = string | number")).toBe(
+    "const un = t.union([t.string, t.number])"
+  );
+  expect(
+    getValidatorsFromString("type un = string | number | { foo: string }")
+  ).toBe("const un = t.union([t.string, t.number, t.type({foo: t.string})])");
+});
+
+test("generates proper validators for intersection types", () => {
+  expect(
+    getValidatorsFromString(
+      "type inter = { foo: string } | { bar: number } | { foo: number }"
+    )
+  ).toBe(
+    "const inter = t.union([t.type({foo: t.string}), t.type({bar: t.number}), t.type({foo: t.number})])"
+  );
+});

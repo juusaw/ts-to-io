@@ -94,11 +94,11 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
       type.getNumberIndexType()!
     )})`;
   } else if (type.isUnion()) {
-    return `t.union([${type.types.map(processType(checker)).join(",")}])`;
+    return `t.union([${type.types.map(processType(checker)).join(", ")}])`;
   } else if (type.isIntersection()) {
     return `t.intersection([${type.types
       .map(processType(checker))
-      .join(",")}])`;
+      .join(", ")}])`;
   } else if (isTupleType(type, checker)) {
     if (type.hasRestElement) {
       console.warn(
