@@ -53,14 +53,6 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return `t.record(${processType(checker)(key)}, ${processType(checker)(
       value
     )})`;
-  } else if (isStringIndexedObjectType(type)) {
-    return `t.record(t.string, ${processType(checker)(
-      type.getStringIndexType()!
-    )})`;
-  } else if (isNumberIndexedType(type)) {
-    return `t.record(t.number, ${processType(checker)(
-      type.getNumberIndexType()!
-    )})`;
   } else if (type.isUnion()) {
     return `t.union([${type.types.map(processType(checker)).join(", ")}])`;
   } else if (type.isIntersection()) {
@@ -78,6 +70,14 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     )}])`;
   } else if (isArrayType(type, checker)) {
     return `t.array(${processType(checker)(type.getNumberIndexType()!)})`;
+  } else if (isStringIndexedObjectType(type)) {
+    return `t.record(t.string, ${processType(checker)(
+      type.getStringIndexType()!
+    )})`;
+  } else if (isNumberIndexedType(type)) {
+    return `t.record(t.number, ${processType(checker)(
+      type.getNumberIndexType()!
+    )})`;
   } else if (isObjectType(type)) {
     return processObjectType(checker)(type);
   } else if (isAnyOrUnknown(type)) {
