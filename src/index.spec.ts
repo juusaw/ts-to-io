@@ -25,6 +25,15 @@ test("generates proper validators for basic interfaces and object types", () => 
   expect(getValidatorsFromString(inputObjectType)).toBe(result);
 });
 
+test("generates proper validators for arrays", () => {
+  expect(getValidatorsFromString("type arr = string[]")).toBe(
+    "const arr = t.array(t.string)"
+  );
+  expect(getValidatorsFromString("type arr = Array<{foo: string}>")).toBe(
+    "const arr = t.array(t.type({foo: t.string}))"
+  );
+});
+
 test("generates proper validators for record types", () => {
   expect(getValidatorsFromString("type rec = Record<number, string>")).toBe(
     "const rec = t.record(t.number, t.string)"
