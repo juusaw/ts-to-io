@@ -47,7 +47,7 @@ const processObjectType = (checker: ts.TypeChecker) => (
     p => (p.valueDeclaration as ts.ParameterDeclaration).questionToken
   );
   if (requiredProperties.length && optionalProperties.length) {
-    return `t.union([t.type({${requiredProperties.map(
+    return `t.intersection([t.type({${requiredProperties.map(
       processProperty(checker)
     )}}), t.partial({${optionalProperties
       .map(processProperty(checker))
