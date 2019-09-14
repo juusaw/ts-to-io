@@ -24,3 +24,12 @@ test("generates proper validators for basic interfaces and object types", () => 
   expect(getValidatorsFromString(inputInterface)).toBe(result);
   expect(getValidatorsFromString(inputObjectType)).toBe(result);
 });
+
+test("generates proper validators for record types", () => {
+  expect(getValidatorsFromString("type rec = Record<number, string>")).toBe(
+    "const rec = t.record(t.number, t.string)"
+  );
+  expect(getValidatorsFromString("type rec = Record<string, null>")).toBe(
+    "const rec = t.record(t.string, t.null)"
+  );
+});
