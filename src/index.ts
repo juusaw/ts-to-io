@@ -25,6 +25,18 @@ function isTupleType(
   return ts.isTupleTypeNode(node!);
 }
 
+function isRecordType(type: ts.Type) {
+  return type.aliasSymbol && type.aliasSymbol.escapedName === "Record";
+}
+
+function isStringIndexedObjectType(type: ts.Type) {
+  return type.getStringIndexType();
+}
+
+function isNumberIndexedType(type: ts.Type) {
+  return type.getNumberIndexType();
+}
+
 function isArrayType(type: ts.Type, checker: ts.TypeChecker) {
   const node = checker.typeToTypeNode(type);
   return ts.isArrayTypeNode(node!);
@@ -68,6 +80,19 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return "t.literal(" + checker.typeToString(type) + ")";
   } else if (isPrimitiveType(type)) {
     return "t." + checker.typeToString(type);
+  } else if (isRecordType(type)) {
+    const [key, value] = type.aliasTypeArguments!;
+    return `t.record(${processType(checker)(key)}, ${processType(checker)(
+      value
+    )})`;
+  } else if (isStringIndexedObjectType(type)) {
+    return `t.record(t.string, ${processType(checker)(
+      type.getStringIndexType()!
+    )})`;
+  } else if (isNumberIndexedType(type)) {
+    return `t.record(t.number, ${processType(checker)(
+      type.getNumberIndexType()!
+    )})`;
   } else if (type.isUnion()) {
     return `t.union([${type.types.map(processType(checker)).join(",")}])`;
   } else if (type.isIntersection()) {
