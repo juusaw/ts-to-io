@@ -1,20 +1,25 @@
 import * as ts from "typescript";
+import { extractFlags } from "./flags";
 
 export function isObjectType(type: ts.Type): type is ts.ObjectType {
-  return type.flags === ts.TypeFlags.Object;
+  return extractFlags(type.flags).includes(ts.TypeFlags.Object);
 }
 
 export function isPrimitiveType(type: ts.Type) {
-  return [
-    ts.TypeFlags.String,
-    ts.TypeFlags.Number,
-    ts.TypeFlags.Boolean,
-    ts.TypeFlags.Null
-  ].includes(type.flags);
+  return extractFlags(type.flags).some(flag =>
+    [
+      ts.TypeFlags.String,
+      ts.TypeFlags.Number,
+      ts.TypeFlags.Boolean,
+      ts.TypeFlags.Null
+    ].includes(flag)
+  );
 }
 
 export function isAnyOrUnknown(type: ts.Type) {
-  return [ts.TypeFlags.Any, ts.TypeFlags.Unknown].includes(type.flags);
+  return extractFlags(type.flags).some(f =>
+    [ts.TypeFlags.Any, ts.TypeFlags.Unknown].includes(f)
+  );
 }
 
 export function isTupleType(
