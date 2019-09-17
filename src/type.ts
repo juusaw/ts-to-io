@@ -22,6 +22,10 @@ export function isAnyOrUnknown(type: ts.Type) {
   );
 }
 
+export function isVoid(type: ts.Type) {
+  return extractFlags(type.flags).includes(ts.TypeFlags.Void);
+}
+
 export function isTupleType(
   type: ts.Type,
   checker: ts.TypeChecker

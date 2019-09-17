@@ -7,7 +7,8 @@ import {
   isTupleType,
   isArrayType,
   isObjectType,
-  isAnyOrUnknown
+  isAnyOrUnknown,
+  isVoid
 } from "./type";
 import { extractFlags } from "./flags";
 
@@ -81,6 +82,8 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     )})`;
   } else if (isObjectType(type)) {
     return processObjectType(checker)(type);
+  } else if (isVoid(type)) {
+    return "t.void";
   } else if (isAnyOrUnknown(type)) {
     return "t.unknown";
   }
