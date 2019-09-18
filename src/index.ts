@@ -18,6 +18,13 @@ const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
   )}`;
 };
 
+const getOptimizedStringLiteralUnion = (type: ts.UnionType) => {
+  const unionTypes = type.types as ts.StringLiteralType[];
+  return `t.keyof({${unionTypes
+    .map((t: ts.StringLiteralType) => `"${t.value}": null`)
+    .join(", ")}})`;
+};
+
 const processObjectType = (checker: ts.TypeChecker) => (
   type: ts.ObjectType
 ) => {
@@ -56,6 +63,10 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
       value
     )})`;
   } else if (type.isUnion()) {
+    const isStringLiteralUnion = type.types.every(t => t.isStringLiteral());
+    if (isStringLiteralUnion) {
+      return getOptimizedStringLiteralUnion(type);
+    }
     return `t.union([${type.types.map(processType(checker)).join(", ")}])`;
   } else if (type.isIntersection()) {
     return `t.intersection([${type.types

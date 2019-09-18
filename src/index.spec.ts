@@ -54,6 +54,12 @@ describe("Generate io-ts validators", () => {
     ).toBe("const un = t.union([t.string, t.number, t.type({foo: t.string})])");
   });
 
+  test("optimizes validator for string literal union types", () => {
+    expect(getValidatorsFromString("type un = 'foo' | 'bar'")).toBe(
+      'const un = t.keyof({"foo": null, "bar": null})'
+    );
+  });
+
   test("generates proper validators for intersection types", () => {
     expect(
       getValidatorsFromString(
