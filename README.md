@@ -15,3 +15,29 @@ const sourceString = `
 
 const validators = getValidatorsFromString(sourceString)
 ```
+
+## Supported types
+
+| Type            | Supported | TypeScript                         | codec                           |
+|-----------------|-----------|------------------------------------|---------------------------------|
+| string          | ✅         | `string`                           | `t.string`                      |
+| number          | ✅         | `number`                           | `t.number`                      |
+| boolean         | ✅         | `boolean`                          | `t.boolean`                     |
+| null            | ✅         | `null`                             | `t.null`                        |
+| undefined       | ✅         | `undefined`                        | `t.undefined`                   |
+| void            | ✅         | `void`                             | `t.void`                        |
+| any, unknown    | ✅         | `any`, `unknown`                   | `t.unknown`                     |
+| array           | ✅         | `Array<A>`                         | `t.array(A)`                    |
+| record          | ✅         | `Record<K, A>`                     | `t.record(K, A)`                |
+| object type     | ✅         | `{ name: string }`                 | `t.type({ name: t.string })`    |
+| interface       | ✅         | `interface I { name: string }`     | `t.type({ name: t.string })`    |
+| literal         | ✅         | `'ABC'`                            | `t.literal('ABC')`              |
+| partial         | ✅         | `Partial<{ name: string }>`        | `t.partial({ name: t.string })` |
+| readonly        | ❌         | `Readonly<A>`                      | -                               |
+| readonly array  | ❌         | `ReadonlyArray<A>`                 | -                               |
+| tuple           | ✅         | `[ A, B ]`                         | `t.tuple([ A, B ])`             |
+| tuple with rest | ❌         | `[ A, B, ...C ]`                   | -                               |
+| union           | ✅         | `A \| B`                           | `t.union([ A, B ])`             |
+| intersection    | ✅         | `A & B`                            | `t.intersection([ A, B ])`      |
+| keyof           | ❌         | `keyof M`                          | -                               |
+| recursive type  | ❌         | `type Node = { children: Node[] }` | -                               |
