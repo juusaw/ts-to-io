@@ -69,6 +69,17 @@ describe("Generate io-ts validators", () => {
       "const inter = t.union([t.type({foo: t.string}), t.type({bar: t.number}), t.type({foo: t.number})])"
     );
   });
+
+  test("generates validators for function types", () => {
+    expect(getValidatorsFromString("type fn = () => void")).toBe(
+      "const fn = t.Function"
+    );
+    expect(
+      getValidatorsFromString(
+        "type fn = (s: string, n: number) => (b: boolean) => object"
+      )
+    ).toBe("const fn = t.Function");
+  });
 });
 
 describe("Internals", () => {
