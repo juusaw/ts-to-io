@@ -12,6 +12,9 @@
     "start": "node build/index.js",
     "test": "jest"
   },
+  "bin": {
+    "ts-to-io": "./cli.js"
+  },
   "devDependencies": {
     "@types/jest": "24.0.18",
     "@types/node": "^12.7.5",
