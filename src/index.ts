@@ -8,7 +8,8 @@ import {
   isArrayType,
   isObjectType,
   isAnyOrUnknown,
-  isVoid
+  isVoid,
+  isFunctionType
 } from "./type";
 import { extractFlags } from "./flags";
 
@@ -91,6 +92,8 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return `t.record(t.number, ${processType(checker)(
       type.getNumberIndexType()!
     )})`;
+  } else if (isFunctionType(type)) {
+    return `t.Function`;
   } else if (isObjectType(type)) {
     return processObjectType(checker)(type);
   } else if (isVoid(type)) {

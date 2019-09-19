@@ -50,3 +50,7 @@ export function isArrayType(type: ts.Type, checker: ts.TypeChecker) {
   const node = checker.typeToTypeNode(type);
   return ts.isArrayTypeNode(node!);
 }
+
+export function isFunctionType(type: ts.Type) {
+  return !!type.getCallSignatures().length;
+}
