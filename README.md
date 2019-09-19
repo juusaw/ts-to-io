@@ -41,3 +41,4 @@ const validators = getValidatorsFromString(sourceString)
 | intersection    | ✅         | `A & B`                            | `t.intersection([ A, B ])`      |
 | keyof           | ❌         | `keyof M`                          | -                               |
 | recursive type  | ❌         | `type Node = { children: Node[] }` | -                               |
+| function        | ✅         | `type fn = () => string`           | `t.Function`                    |
