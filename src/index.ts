@@ -110,9 +110,13 @@ function handleTypeDeclaration(
   checker: ts.TypeChecker,
   result: string[]
 ) {
-  const symbol = checker.getSymbolAtLocation(node.name);
-  const type = checker.getTypeAtLocation(node);
-  result.push(`const ${symbol!.name} = ` + processType(checker)(type));
+  try {
+    const symbol = checker.getSymbolAtLocation(node.name);
+    const type = checker.getTypeAtLocation(node);
+    result.push(`const ${symbol!.name} = ` + processType(checker)(type));
+  } catch (e) {
+    result.push("// Error: Failed to generate a codec for type");
+  }
 }
 
 function handleInterfaceDeclaration(
@@ -120,9 +124,13 @@ function handleInterfaceDeclaration(
   checker: ts.TypeChecker,
   result: string[]
 ) {
-  const symbol = checker.getSymbolAtLocation(node.name);
-  const type = checker.getTypeAtLocation(node);
-  result.push(`const ${symbol!.name} = ` + processType(checker)(type));
+  try {
+    const symbol = checker.getSymbolAtLocation(node.name);
+    const type = checker.getTypeAtLocation(node);
+    result.push(`const ${symbol!.name} = ` + processType(checker)(type));
+  } catch (e) {
+    result.push("// Error: Failed to generate a codec for interface");
+  }
 }
 
 function handleVariableDeclaration(
@@ -130,14 +138,20 @@ function handleVariableDeclaration(
   checker: ts.TypeChecker,
   result: string[]
 ) {
-  const symbol = checker.getSymbolAtLocation(
-    node.declarationList.declarations[0].name
-  );
-  const type = checker.getTypeOfSymbolAtLocation(
-    symbol!,
-    symbol!.valueDeclaration!
-  );
-  result.push(processType(checker)(type));
+  try {
+    const symbol = checker.getSymbolAtLocation(
+      node.declarationList.declarations[0].name
+    );
+    const type = checker.getTypeOfSymbolAtLocation(
+      symbol!,
+      symbol!.valueDeclaration!
+    );
+    result.push(processType(checker)(type));
+  } catch (e) {
+    result.push(
+      "// Error: Failed to generate a codec for variable declaration"
+    );
+  }
 }
 
 const visit = (checker: ts.TypeChecker, result: string[]) => (
