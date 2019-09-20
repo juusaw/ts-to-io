@@ -1,14 +1,16 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
+    "target": "es5",
+    "module": "commonjs",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "declaration": true,
     "outDir": "build",
     "sourceMap": true,
-    "lib": ["es2016", "esnext.array", "dom"],
     "strict": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "scripts"]
+  "exclude": ["node_modules"]
 }

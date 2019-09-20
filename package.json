@@ -1,8 +1,12 @@
 {
   "name": "ts-to-io",
   "version": "0.0.1",
-  "main": "index.js",
   "license": "MIT",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "files": [
+    "build/**/*"
+  ],
   "dependencies": {
     "jest": "24.9.0",
     "typescript": "3.6.3"
