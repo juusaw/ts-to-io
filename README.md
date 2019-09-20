@@ -1,8 +1,23 @@
 # ts-to-io
 
-Converts Typescript type and interface definitions into io-ts type validators.
+Converts TypeScript type and interface definitions into [io-ts](https://github.com/gcanti/io-ts) type validators.
 
 ## Usage
+
+## As a script
+
+```bash
+$ npm install -g ts-to-io
+$ ts-to-io file.ts
+```
+
+or
+
+```bash
+$ npx ts-to-io file.ts
+```
+
+### From code
 
 NOTE: The validator generation is not intended to be performed at runtime. You should first generate the validators locally and then include them in the program source.
 
@@ -10,7 +25,7 @@ NOTE: The validator generation is not intended to be performed at runtime. You s
 import { getValidatorsFromString } from "ts-to-io"
 
 const sourceString = `
-...
+  type Person = { name: string; age: number | null }
 `
 
 const validators = getValidatorsFromString(sourceString)
