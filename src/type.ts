@@ -54,3 +54,7 @@ export function isArrayType(type: ts.Type, checker: ts.TypeChecker) {
 export function isFunctionType(type: ts.Type) {
   return !!type.getCallSignatures().length;
 }
+
+export function isBasicObjectType(type: ts.Type, checker: ts.TypeChecker) {
+  return checker.typeToString(type) === "object";
+}

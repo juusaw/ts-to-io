@@ -9,7 +9,8 @@ import {
   isObjectType,
   isAnyOrUnknown,
   isVoid,
-  isFunctionType
+  isFunctionType,
+  isBasicObjectType
 } from "./type";
 import { extractFlags } from "./flags";
 
@@ -58,6 +59,8 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return "t.literal(" + checker.typeToString(type) + ")";
   } else if (isPrimitiveType(type)) {
     return "t." + checker.typeToString(type);
+  } else if (isBasicObjectType(type, checker)) {
+    return `t.type({})`;
   } else if (isRecordType(type)) {
     const [key, value] = type.aliasTypeArguments!;
     return `t.record(${processType(checker)(key)}, ${processType(checker)(
