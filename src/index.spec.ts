@@ -2,7 +2,7 @@ import { getValidatorsFromString } from ".";
 import { extractFlags } from "./flags";
 
 describe("Generate io-ts validators", () => {
-  test("generates proper validators for primitive types", () => {
+  test("generates validators for primitive types", () => {
     expect(getValidatorsFromString("type num = number;")).toBe(
       "const num = t.number"
     );
@@ -14,7 +14,7 @@ describe("Generate io-ts validators", () => {
     );
   });
 
-  test("generates proper validators for basic interfaces and object types", () => {
+  test("generates validators for basic interfaces and object types", () => {
     const inputInterface = `
     interface Test { foo: number, bar: string }
   `;
@@ -27,7 +27,7 @@ describe("Generate io-ts validators", () => {
     expect(getValidatorsFromString(inputObjectType)).toBe(result);
   });
 
-  test("generates proper validators for arrays", () => {
+  test("generates validators for arrays", () => {
     expect(getValidatorsFromString("type arr = string[]")).toBe(
       "const arr = t.array(t.string)"
     );
@@ -36,7 +36,7 @@ describe("Generate io-ts validators", () => {
     );
   });
 
-  test("generates proper validators for record types", () => {
+  test("generates validators for record types", () => {
     expect(getValidatorsFromString("type rec = Record<number, string>")).toBe(
       "const rec = t.record(t.number, t.string)"
     );
@@ -45,7 +45,7 @@ describe("Generate io-ts validators", () => {
     );
   });
 
-  test("generates proper validators for union types", () => {
+  test("generates validators for union types", () => {
     expect(getValidatorsFromString("type un = string | number")).toBe(
       "const un = t.union([t.string, t.number])"
     );
@@ -60,7 +60,7 @@ describe("Generate io-ts validators", () => {
     );
   });
 
-  test("generates proper validators for intersection types", () => {
+  test("generates validators for intersection types", () => {
     expect(
       getValidatorsFromString(
         "type inter = { foo: string } | { bar: number } | { foo: number }"
@@ -79,6 +79,18 @@ describe("Generate io-ts validators", () => {
         "type fn = (s: string, n: number) => (b: boolean) => object"
       )
     ).toBe("const fn = t.Function");
+  });
+
+  test("generates validators for literal types", () => {
+    expect(getValidatorsFromString('type foo = "foo"')).toBe(
+      'const foo = t.literal("foo")'
+    );
+    expect(getValidatorsFromString("type one = 1")).toBe(
+      "const one = t.literal(1)"
+    );
+    expect(getValidatorsFromString("type f = false")).toBe(
+      "const f = t.literal(false)"
+    );
   });
 });
 
