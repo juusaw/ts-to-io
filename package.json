@@ -7,7 +7,7 @@
   "types": "./build/index.d.ts",
   "files": [
     "build/**/*",
-    "./cli.js"
+    "cli.js"
   ],
   "scripts": {
     "build": "tsc",
