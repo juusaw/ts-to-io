@@ -2,6 +2,7 @@
   "name": "ts-to-io",
   "version": "0.1.0",
   "license": "MIT",
+  "author": "Juuso Mikkonen",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
