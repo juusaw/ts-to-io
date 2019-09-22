@@ -1,4 +1,4 @@
-const MAX_FLAG_COUNT = 26;
+const MAX_FLAG_COUNT = 28;
 
 const values = new Array(MAX_FLAG_COUNT)
   .fill(undefined)
