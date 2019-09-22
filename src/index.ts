@@ -10,7 +10,8 @@ import {
   isAnyOrUnknown,
   isVoid,
   isFunctionType,
-  isBasicObjectType
+  isBasicObjectType,
+  isLiteralType
 } from "./type";
 import { extractFlags } from "./flags";
 
@@ -55,7 +56,7 @@ const processObjectType = (checker: ts.TypeChecker) => (
 };
 
 const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
-  if (type.isLiteral()) {
+  if (isLiteralType(type)) {
     return "t.literal(" + checker.typeToString(type) + ")";
   } else if (isPrimitiveType(type)) {
     return "t." + checker.typeToString(type);

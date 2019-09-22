@@ -58,3 +58,13 @@ export function isFunctionType(type: ts.Type) {
 export function isBasicObjectType(type: ts.Type, checker: ts.TypeChecker) {
   return checker.typeToString(type) === "object";
 }
+
+export function isLiteralType(type: ts.Type) {
+  return extractFlags(type.flags).some(f =>
+    [
+      ts.TypeFlags.StringLiteral,
+      ts.TypeFlags.NumberLiteral,
+      ts.TypeFlags.BooleanLiteral
+    ].includes(f)
+  );
+}
