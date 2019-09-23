@@ -92,6 +92,12 @@ describe("Generate io-ts validators", () => {
       "const f = t.literal(false)"
     );
   });
+
+  test("handles nullable types correctly", () => {
+    expect(getValidatorsFromString('type foobar = "foo" | "bar" | null')).toBe(
+      'const foobar = t.union([t.null, t.literal("foo"), t.literal("bar")])'
+    );
+  });
 });
 
 describe("Internals", () => {
