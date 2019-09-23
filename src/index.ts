@@ -176,6 +176,10 @@ const getImports = () => {
   return `import * as t from "io-ts"`;
 };
 
+const compilerOptions: ts.CompilerOptions = {
+  strictNullChecks: true
+};
+
 export function getValidatorsFromString(source: string) {
   const DEFAULT_FILE_NAME = "io-to-ts.ts";
   const defaultCompilerHostOptions = ts.createCompilerHost({});
@@ -205,7 +209,7 @@ export function getValidatorsFromString(source: string) {
 
   const program = ts.createProgram(
     [DEFAULT_FILE_NAME],
-    {},
+    compilerOptions,
     compilerHostOptions
   );
   const checker = program.getTypeChecker();
@@ -218,7 +222,7 @@ export function getValidatorsFromString(source: string) {
 }
 
 export function getValidatorsFromFileNames(files: string[]) {
-  const program = ts.createProgram(files, {});
+  const program = ts.createProgram(files, compilerOptions);
   const checker = program.getTypeChecker();
   const result = [getImports()];
   for (const sourceFile of program.getSourceFiles()) {
