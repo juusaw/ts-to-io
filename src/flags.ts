@@ -10,8 +10,8 @@ export function extractFlags(input: number) {
     if (input >= values[i]) {
       input -= values[i];
       flags.push(values[i]);
-      if (input === 0) return flags;
     }
+    if (input === 0) return flags;
   }
   return flags;
 }

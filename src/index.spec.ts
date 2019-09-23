@@ -102,7 +102,10 @@ describe("Generate io-ts validators", () => {
 
 describe("Internals", () => {
   test("gets binary flags", () => {
+    expect(extractFlags(0)).toEqual([]);
+    expect(extractFlags(1)).toEqual([1]);
     expect(extractFlags(10)).toEqual([8, 2]);
     expect(extractFlags(100)).toEqual([64, 32, 4]);
+    expect(extractFlags(67108864)).toEqual([67108864]);
   });
 });
