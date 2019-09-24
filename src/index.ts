@@ -14,6 +14,7 @@ import {
   isLiteralType
 } from "./type";
 import { extractFlags } from "./flags";
+import { defaultConfig } from "./config";
 
 const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
   return `${s.name}: ${processType(checker)(
@@ -115,6 +116,7 @@ function handleTypeDeclaration(
 ) {
   try {
     const symbol = checker.getSymbolAtLocation(node.name);
+    console.log(node.getSourceFile().fileName);
     const type = checker.getTypeAtLocation(node);
     result.push(`const ${symbol!.name} = ` + processType(checker)(type));
   } catch (e) {
@@ -145,6 +147,8 @@ function handleVariableDeclaration(
     const symbol = checker.getSymbolAtLocation(
       node.declarationList.declarations[0].name
     );
+    console.log(node.getSourceFile().fileName);
+
     const type = checker.getTypeOfSymbolAtLocation(
       symbol!,
       symbol!.valueDeclaration!
@@ -179,7 +183,10 @@ const compilerOptions: ts.CompilerOptions = {
   strictNullChecks: true
 };
 
-export function getValidatorsFromString(source: string) {
+export function getValidatorsFromString(
+  source: string,
+  config = defaultConfig
+) {
   const DEFAULT_FILE_NAME = "io-to-ts.ts";
   const defaultCompilerHostOptions = ts.createCompilerHost({});
 
@@ -220,7 +227,10 @@ export function getValidatorsFromString(source: string) {
   return result.join("\n\n");
 }
 
-export function getValidatorsFromFileNames(files: string[]) {
+export function getValidatorsFromFileNames(
+  files: string[],
+  config = defaultConfig
+) {
   const program = ts.createProgram(files, compilerOptions);
   const checker = program.getTypeChecker();
   const result = [getImports()];
