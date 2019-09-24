@@ -105,8 +105,7 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
   } else if (isAnyOrUnknown(type)) {
     return "t.unknown";
   }
-  console.error("Unknown type with type flag: ", extractFlags(type.flags));
-  return "null";
+  throw Error("Unknown type with type flags: " + extractFlags(type.flags));
 };
 
 function handleTypeDeclaration(
