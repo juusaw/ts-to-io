@@ -109,67 +109,42 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
   throw Error("Unknown type with type flags: " + extractFlags(type.flags));
 };
 
-function handleTypeDeclaration(
-  node: ts.TypeAliasDeclaration,
-  checker: ts.TypeChecker,
-  result: string[]
+function handleDeclaration(
+  node:
+    | ts.TypeAliasDeclaration
+    | ts.InterfaceDeclaration
+    | ts.VariableStatement,
+  checker: ts.TypeChecker
 ) {
+  let symbol, type;
   try {
-    const symbol = checker.getSymbolAtLocation(node.name);
-    console.log(node.getSourceFile().fileName);
-    const type = checker.getTypeAtLocation(node);
-    result.push(`const ${symbol!.name} = ` + processType(checker)(type));
+    if (node.kind === ts.SyntaxKind.VariableStatement) {
+      symbol = checker.getSymbolAtLocation(
+        node.declarationList.declarations[0].name
+      );
+      type = checker.getTypeOfSymbolAtLocation(
+        symbol!,
+        symbol!.valueDeclaration!
+      );
+    } else {
+      symbol = checker.getSymbolAtLocation(node.name);
+      type = checker.getTypeAtLocation(node);
+    }
+    return `const ${symbol!.name} = ` + processType(checker)(type);
   } catch (e) {
-    result.push("// Error: Failed to generate a codec for type");
-  }
-}
-
-function handleInterfaceDeclaration(
-  node: ts.InterfaceDeclaration,
-  checker: ts.TypeChecker,
-  result: string[]
-) {
-  try {
-    const symbol = checker.getSymbolAtLocation(node.name);
-    const type = checker.getTypeAtLocation(node);
-    result.push(`const ${symbol!.name} = ` + processType(checker)(type));
-  } catch (e) {
-    result.push("// Error: Failed to generate a codec for interface");
-  }
-}
-
-function handleVariableDeclaration(
-  node: ts.VariableStatement,
-  checker: ts.TypeChecker,
-  result: string[]
-) {
-  try {
-    const symbol = checker.getSymbolAtLocation(
-      node.declarationList.declarations[0].name
-    );
-    console.log(node.getSourceFile().fileName);
-
-    const type = checker.getTypeOfSymbolAtLocation(
-      symbol!,
-      symbol!.valueDeclaration!
-    );
-    result.push(processType(checker)(type));
-  } catch (e) {
-    result.push(
-      "// Error: Failed to generate a codec for variable declaration"
-    );
+    return "// Error: Failed to generate a codec";
   }
 }
 
 const visit = (checker: ts.TypeChecker, result: string[]) => (
   node: ts.Node
 ) => {
-  if (ts.isTypeAliasDeclaration(node)) {
-    handleTypeDeclaration(node, checker, result);
-  } else if (ts.isVariableStatement(node)) {
-    handleVariableDeclaration(node, checker, result);
-  } else if (ts.isInterfaceDeclaration(node)) {
-    handleInterfaceDeclaration(node, checker, result);
+  if (
+    ts.isTypeAliasDeclaration(node) ||
+    ts.isVariableStatement(node) ||
+    ts.isInterfaceDeclaration(node)
+  ) {
+    result.push(handleDeclaration(node, checker));
   } else if (ts.isModuleDeclaration(node)) {
     ts.forEachChild(node, visit(checker, result));
   }
