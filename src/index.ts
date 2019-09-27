@@ -14,7 +14,7 @@ import {
   isLiteralType
 } from "./type";
 import { extractFlags } from "./flags";
-import { defaultConfig } from "./config";
+import { defaultConfig, TsToIoConfig, DEFAULT_FILE_NAME } from "./config";
 
 const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
   return `${s.name}: ${processType(checker)(
@@ -136,9 +136,17 @@ function handleDeclaration(
   }
 }
 
-const visit = (checker: ts.TypeChecker, result: string[]) => (
-  node: ts.Node
-) => {
+const visit = (
+  checker: ts.TypeChecker,
+  config: TsToIoConfig,
+  result: string[]
+) => (node: ts.Node) => {
+  if (
+    !config.followImports &&
+    !config.fileNames.includes(node.getSourceFile().fileName)
+  ) {
+    return;
+  }
   if (
     ts.isTypeAliasDeclaration(node) ||
     ts.isVariableStatement(node) ||
@@ -146,7 +154,7 @@ const visit = (checker: ts.TypeChecker, result: string[]) => (
   ) {
     result.push(handleDeclaration(node, checker));
   } else if (ts.isModuleDeclaration(node)) {
-    ts.forEachChild(node, visit(checker, result));
+    ts.forEachChild(node, visit(checker, config, result));
   }
 };
 
@@ -160,9 +168,8 @@ const compilerOptions: ts.CompilerOptions = {
 
 export function getValidatorsFromString(
   source: string,
-  config = defaultConfig
+  config = { ...defaultConfig, fileNames: [DEFAULT_FILE_NAME] }
 ) {
-  const DEFAULT_FILE_NAME = "io-to-ts.ts";
   const defaultCompilerHostOptions = ts.createCompilerHost({});
 
   const compilerHostOptions = {
@@ -197,21 +204,21 @@ export function getValidatorsFromString(
   const result: string[] = [];
   ts.forEachChild(
     program.getSourceFile(DEFAULT_FILE_NAME)!,
-    visit(checker, result)
+    visit(checker, config, result)
   );
   return result.join("\n\n");
 }
 
 export function getValidatorsFromFileNames(
   files: string[],
-  config = defaultConfig
+  config = { ...defaultConfig, fileNames: files }
 ) {
   const program = ts.createProgram(files, compilerOptions);
   const checker = program.getTypeChecker();
   const result = [getImports()];
   for (const sourceFile of program.getSourceFiles()) {
     if (!sourceFile.isDeclarationFile) {
-      ts.forEachChild(sourceFile, visit(checker, result));
+      ts.forEachChild(sourceFile, visit(checker, config, result));
     }
   }
   return result.join("\n\n");
