@@ -201,7 +201,7 @@ export function getValidatorsFromString(
     compilerHostOptions
   );
   const checker = program.getTypeChecker();
-  const result: string[] = [];
+  const result = config.includeHeader ? [getImports()] : [];
   ts.forEachChild(
     program.getSourceFile(DEFAULT_FILE_NAME)!,
     visit(checker, config, result)
@@ -215,7 +215,7 @@ export function getValidatorsFromFileNames(
 ) {
   const program = ts.createProgram(files, compilerOptions);
   const checker = program.getTypeChecker();
-  const result = [getImports()];
+  const result = config.includeHeader ? [getImports()] : [];
   for (const sourceFile of program.getSourceFiles()) {
     if (!sourceFile.isDeclarationFile) {
       ts.forEachChild(sourceFile, visit(checker, config, result));
