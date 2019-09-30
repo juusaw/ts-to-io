@@ -114,6 +114,20 @@ describe("Generate io-ts validators", () => {
   });
 });
 
+describe("Configuration", () => {
+  test("includeHeader", () => {
+    expect(getValidatorsFromString("type a = number;", testConfig)).toBe(
+      "const a = t.number"
+    );
+    expect(
+      getValidatorsFromString("type a = number;", {
+        ...testConfig,
+        includeHeader: true
+      })
+    ).toBe('import * as t from "io-ts"\n\nconst a = t.number');
+  });
+});
+
 describe("Internals", () => {
   test("gets binary flags", () => {
     expect(extractFlags(0)).toEqual([]);
