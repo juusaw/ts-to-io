@@ -2,4 +2,4 @@
 
 var tsToIo = require("./build/index.js");
 
-console.log(tsToIo.getValidatorsFromFileNames([process.argv[2]]));
+console.log(tsToIo.getValidatorsFromFileNames());
