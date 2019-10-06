@@ -2,6 +2,7 @@ import program from "commander";
 
 export function getCliConfig(): TsToIoConfig {
   program
+    .name("ts-to-io")
     .option(
       "--follow-imports",
       "output codecs for types declared in imported files"
