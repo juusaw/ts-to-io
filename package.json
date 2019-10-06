@@ -3,6 +3,10 @@
   "version": "0.2.0",
   "license": "MIT",
   "author": "Juuso Mikkonen",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/juusaw/ts-to-io.git"
+  },
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
