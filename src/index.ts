@@ -215,7 +215,11 @@ export function getValidatorsFromString(
   return result.join("\n\n");
 }
 
-export function getValidatorsFromFileNames(config: TsToIoConfig) {
+export function getValidatorsFromFileNames() {
+  const config = getCliConfig();
+  if (!config.fileNames.length) {
+    return displayHelp();
+  }
   const program = ts.createProgram(config.fileNames, compilerOptions);
   const checker = program.getTypeChecker();
   const result = config.includeHeader ? [getImports()] : [];
@@ -225,17 +229,4 @@ export function getValidatorsFromFileNames(config: TsToIoConfig) {
     }
   }
   return result.join("\n\n");
-}
-
-function isEntryPoint() {
-  return require.main === module;
-}
-
-if (isEntryPoint()) {
-  const config = getCliConfig();
-  if (!config.fileNames.length) {
-    displayHelp();
-  } else {
-    console.log(getValidatorsFromFileNames(config));
-  }
 }
