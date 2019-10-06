@@ -14,7 +14,13 @@ import {
   isLiteralType
 } from "./type";
 import { extractFlags } from "./flags";
-import { defaultConfig, TsToIoConfig, DEFAULT_FILE_NAME } from "./config";
+import {
+  defaultConfig,
+  TsToIoConfig,
+  DEFAULT_FILE_NAME,
+  getCliConfig,
+  displayHelp
+} from "./config";
 
 const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
   return `${s.name}: ${processType(checker)(
@@ -209,11 +215,8 @@ export function getValidatorsFromString(
   return result.join("\n\n");
 }
 
-export function getValidatorsFromFileNames(
-  files: string[],
-  config = { ...defaultConfig, fileNames: files }
-) {
-  const program = ts.createProgram(files, compilerOptions);
+export function getValidatorsFromFileNames(config: TsToIoConfig) {
+  const program = ts.createProgram(config.fileNames, compilerOptions);
   const checker = program.getTypeChecker();
   const result = config.includeHeader ? [getImports()] : [];
   for (const sourceFile of program.getSourceFiles()) {
@@ -229,5 +232,10 @@ function isEntryPoint() {
 }
 
 if (isEntryPoint()) {
-  console.log(getValidatorsFromFileNames([process.argv[2]]));
+  const config = getCliConfig();
+  if (!config.fileNames.length) {
+    displayHelp();
+  } else {
+    console.log(getValidatorsFromFileNames(config));
+  }
 }
