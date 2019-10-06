@@ -31,6 +31,16 @@ const sourceString = `
 const validators = getValidatorsFromString(sourceString)
 ```
 
+## Configuration
+
+ts-to-io supports the following config options
+
+
+| Key             | CLI opt               | Default | Description                                        |
+|-----------------|-----------------------|---------|----------------------------------------------------|
+| `followImports` | `--follow-imports`    | `false` | output codecs for types declared in imported files |
+| `includeHeader` | `--no-include-header` | `true`  | omit io-ts import from the output                  |
+
 ## Supported types
 
 | Type            | Supported | TypeScript                         | codec                           |
