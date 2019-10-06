@@ -9,7 +9,8 @@
     "declaration": true,
     "outDir": "build",
     "sourceMap": true,
-    "strict": true
+    "strict": true,
+    "esModuleInterop": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]

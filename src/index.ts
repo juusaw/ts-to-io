@@ -14,6 +14,13 @@ import {
   isLiteralType
 } from "./type";
 import { extractFlags } from "./flags";
+import {
+  defaultConfig,
+  TsToIoConfig,
+  DEFAULT_FILE_NAME,
+  getCliConfig,
+  displayHelp
+} from "./config";
 
 const processProperty = (checker: ts.TypeChecker) => (s: ts.Symbol) => {
   return `${s.name}: ${processType(checker)(
@@ -108,66 +115,52 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
   throw Error("Unknown type with type flags: " + extractFlags(type.flags));
 };
 
-function handleTypeDeclaration(
-  node: ts.TypeAliasDeclaration,
-  checker: ts.TypeChecker,
-  result: string[]
+function handleDeclaration(
+  node:
+    | ts.TypeAliasDeclaration
+    | ts.InterfaceDeclaration
+    | ts.VariableStatement,
+  checker: ts.TypeChecker
 ) {
+  let symbol, type;
   try {
-    const symbol = checker.getSymbolAtLocation(node.name);
-    const type = checker.getTypeAtLocation(node);
-    result.push(`const ${symbol!.name} = ` + processType(checker)(type));
+    if (node.kind === ts.SyntaxKind.VariableStatement) {
+      symbol = checker.getSymbolAtLocation(
+        node.declarationList.declarations[0].name
+      );
+      type = checker.getTypeOfSymbolAtLocation(
+        symbol!,
+        symbol!.valueDeclaration!
+      );
+    } else {
+      symbol = checker.getSymbolAtLocation(node.name);
+      type = checker.getTypeAtLocation(node);
+    }
+    return `const ${symbol!.name} = ` + processType(checker)(type);
   } catch (e) {
-    result.push("// Error: Failed to generate a codec for type");
+    return "// Error: Failed to generate a codec";
   }
 }
 
-function handleInterfaceDeclaration(
-  node: ts.InterfaceDeclaration,
+const visit = (
   checker: ts.TypeChecker,
+  config: TsToIoConfig,
   result: string[]
-) {
-  try {
-    const symbol = checker.getSymbolAtLocation(node.name);
-    const type = checker.getTypeAtLocation(node);
-    result.push(`const ${symbol!.name} = ` + processType(checker)(type));
-  } catch (e) {
-    result.push("// Error: Failed to generate a codec for interface");
+) => (node: ts.Node) => {
+  if (
+    !config.followImports &&
+    !config.fileNames.includes(node.getSourceFile().fileName)
+  ) {
+    return;
   }
-}
-
-function handleVariableDeclaration(
-  node: ts.VariableStatement,
-  checker: ts.TypeChecker,
-  result: string[]
-) {
-  try {
-    const symbol = checker.getSymbolAtLocation(
-      node.declarationList.declarations[0].name
-    );
-    const type = checker.getTypeOfSymbolAtLocation(
-      symbol!,
-      symbol!.valueDeclaration!
-    );
-    result.push(processType(checker)(type));
-  } catch (e) {
-    result.push(
-      "// Error: Failed to generate a codec for variable declaration"
-    );
-  }
-}
-
-const visit = (checker: ts.TypeChecker, result: string[]) => (
-  node: ts.Node
-) => {
-  if (ts.isTypeAliasDeclaration(node)) {
-    handleTypeDeclaration(node, checker, result);
-  } else if (ts.isVariableStatement(node)) {
-    handleVariableDeclaration(node, checker, result);
-  } else if (ts.isInterfaceDeclaration(node)) {
-    handleInterfaceDeclaration(node, checker, result);
+  if (
+    ts.isTypeAliasDeclaration(node) ||
+    ts.isVariableStatement(node) ||
+    ts.isInterfaceDeclaration(node)
+  ) {
+    result.push(handleDeclaration(node, checker));
   } else if (ts.isModuleDeclaration(node)) {
-    ts.forEachChild(node, visit(checker, result));
+    ts.forEachChild(node, visit(checker, config, result));
   }
 };
 
@@ -179,8 +172,10 @@ const compilerOptions: ts.CompilerOptions = {
   strictNullChecks: true
 };
 
-export function getValidatorsFromString(source: string) {
-  const DEFAULT_FILE_NAME = "io-to-ts.ts";
+export function getValidatorsFromString(
+  source: string,
+  config = { ...defaultConfig, fileNames: [DEFAULT_FILE_NAME] }
+) {
   const defaultCompilerHostOptions = ts.createCompilerHost({});
 
   const compilerHostOptions = {
@@ -212,21 +207,21 @@ export function getValidatorsFromString(source: string) {
     compilerHostOptions
   );
   const checker = program.getTypeChecker();
-  const result: string[] = [];
+  const result = config.includeHeader ? [getImports()] : [];
   ts.forEachChild(
     program.getSourceFile(DEFAULT_FILE_NAME)!,
-    visit(checker, result)
+    visit(checker, config, result)
   );
   return result.join("\n\n");
 }
 
-export function getValidatorsFromFileNames(files: string[]) {
-  const program = ts.createProgram(files, compilerOptions);
+export function getValidatorsFromFileNames(config: TsToIoConfig) {
+  const program = ts.createProgram(config.fileNames, compilerOptions);
   const checker = program.getTypeChecker();
-  const result = [getImports()];
+  const result = config.includeHeader ? [getImports()] : [];
   for (const sourceFile of program.getSourceFiles()) {
     if (!sourceFile.isDeclarationFile) {
-      ts.forEachChild(sourceFile, visit(checker, result));
+      ts.forEachChild(sourceFile, visit(checker, config, result));
     }
   }
   return result.join("\n\n");
@@ -237,5 +232,10 @@ function isEntryPoint() {
 }
 
 if (isEntryPoint()) {
-  console.log(getValidatorsFromFileNames([process.argv[2]]));
+  const config = getCliConfig();
+  if (!config.fileNames.length) {
+    displayHelp();
+  } else {
+    console.log(getValidatorsFromFileNames(config));
+  }
 }
