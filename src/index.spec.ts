@@ -34,6 +34,17 @@ describe("Generate io-ts validators", () => {
     expect(getValidatorsFromString(inputObjectType, testConfig)).toBe(result);
   });
 
+  test("generates validators for interfaces with optional fields", () => {
+    expect(
+      getValidatorsFromString(
+        "interface Test { foo: string, bar?: number }",
+        testConfig
+      )
+    ).toBe(
+      "const Test = t.intersection([t.type({foo: t.string}), t.partial({bar: t.union([t.undefined, t.number])})])"
+    );
+  });
+
   test("generates validators for arrays", () => {
     expect(getValidatorsFromString("type arr = string[]", testConfig)).toBe(
       "const arr = t.array(t.string)"

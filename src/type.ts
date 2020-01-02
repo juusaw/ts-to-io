@@ -11,7 +11,8 @@ export function isPrimitiveType(type: ts.Type) {
       ts.TypeFlags.String,
       ts.TypeFlags.Number,
       ts.TypeFlags.Boolean,
-      ts.TypeFlags.Null
+      ts.TypeFlags.Null,
+      ts.TypeFlags.Undefined
     ].includes(flag)
   );
 }
