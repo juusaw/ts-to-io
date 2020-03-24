@@ -52,7 +52,7 @@ const processObjectType = (checker: ts.TypeChecker) => (
       .map(processProperty(checker))
       .join(", ")}})])`;
   } else if (optionalProperties.length === 0) {
-    return `t.type({${requiredProperties
+    return `t.strict({${requiredProperties
       .map(processProperty(checker))
       .join(", ")}})`;
   } else {
