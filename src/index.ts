@@ -136,7 +136,7 @@ function handleDeclaration(
       symbol = checker.getSymbolAtLocation(node.name);
       type = checker.getTypeAtLocation(node);
     }
-    return `const ${symbol!.name} = ` + processType(checker)(type);
+    return `export const ${symbol!.name} = ` + processType(checker)(type);
   } catch (e) {
     return "// Error: Failed to generate a codec";
   }
