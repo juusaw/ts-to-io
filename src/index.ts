@@ -138,7 +138,7 @@ function handleDeclaration(
     }
     return `const ${symbol!.name} = ` + processType(checker)(type);
   } catch (e) {
-    return "// Error: Failed to generate a codec";
+    return `// Error: Failed to generate a codec for ${symbol ? symbol.name : ''}`;
   }
 }
 
