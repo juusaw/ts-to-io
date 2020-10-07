@@ -26,12 +26,10 @@ export function isVoid(type: ts.Type) {
   return extractFlags(type.flags).includes(ts.TypeFlags.Void);
 }
 
-export function isTupleType(
-  type: ts.Type,
-  checker: ts.TypeChecker
-): type is ts.TupleType {
-  const node = checker.typeToTypeNode(type);
-  return ts.isTupleTypeNode(node!);
+export function isTupleType(type: ts.Type): type is ts.TupleType {
+  return (
+    typeof (type as ts.TupleTypeReference).target?.hasRestElement === "boolean"
+  );
 }
 
 export function isRecordType(type: ts.Type) {
@@ -46,9 +44,8 @@ export function isNumberIndexedType(type: ts.Type) {
   return type.getNumberIndexType();
 }
 
-export function isArrayType(type: ts.Type, checker: ts.TypeChecker) {
-  const node = checker.typeToTypeNode(type);
-  return ts.isArrayTypeNode(node!);
+export function isArrayType(type: ts.Type) {
+  return type.symbol.escapedName === "Array";
 }
 
 export function isFunctionType(type: ts.Type) {

@@ -69,11 +69,6 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return "t." + checker.typeToString(type);
   } else if (isBasicObjectType(type, checker)) {
     return `t.type({})`;
-  } else if (isRecordType(type)) {
-    const [key, value] = type.aliasTypeArguments!;
-    return `t.record(${processType(checker)(key)}, ${processType(checker)(
-      value
-    )})`;
   } else if (type.isUnion()) {
     const isStringLiteralUnion = type.types.every(t => t.isStringLiteral());
     if (isStringLiteralUnion) {
@@ -84,7 +79,7 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return `t.intersection([${type.types
       .map(processType(checker))
       .join(", ")}])`;
-  } else if (isTupleType(type, checker)) {
+  } else if (isTupleType(type)) {
     if (type.hasRestElement) {
       console.warn(
         "io-ts default validators do not support rest parameters in a tuple"
@@ -93,8 +88,13 @@ const processType = (checker: ts.TypeChecker) => (type: ts.Type): string => {
     return `t.tuple([${(type as ts.TupleType).typeArguments!.map(
       processType(checker)
     )}])`;
-  } else if (isArrayType(type, checker)) {
+  } else if (isArrayType(type)) {
     return `t.array(${processType(checker)(type.getNumberIndexType()!)})`;
+  } else if (isRecordType(type)) {
+    const [key, value] = type.aliasTypeArguments!;
+    return `t.record(${processType(checker)(key)}, ${processType(checker)(
+      value
+    )})`;
   } else if (isStringIndexedObjectType(type)) {
     return `t.record(t.string, ${processType(checker)(
       type.getStringIndexType()!
