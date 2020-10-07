@@ -105,6 +105,12 @@ describe("Generate io-ts validators", () => {
     );
   });
 
+  test("generates validators for tuple types", () => {
+    expect(
+      getValidatorsFromString("type foo = [number, string]", testConfig)
+    ).toBe("const foo = t.tuple([t.number,t.string])");
+  });
+
   test("handles nullable types correctly", () => {
     expect(
       getValidatorsFromString('type foobar = "foo" | "bar" | null', testConfig)
