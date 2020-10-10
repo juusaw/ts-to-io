@@ -1,0 +1,17 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install deps
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Run unit tests
+        run: npm run test
