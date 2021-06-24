@@ -46,7 +46,7 @@ export function isNumberIndexedType(type: ts.Type) {
 }
 
 export function isArrayType(type: ts.Type) {
-  return type.symbol.escapedName === "Array";
+  return type.symbol && type.symbol.escapedName === "Array";
 }
 
 export function isFunctionType(type: ts.Type) {
